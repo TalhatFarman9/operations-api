@@ -1,0 +1,19 @@
+{
+  "name": "operations-api",
+  "version": "1.0.0",
+  "description": "Small Express and SQLite API for daily course operations records",
+  "main": "server.js",
+  "scripts": {
+    "migrate": "node migrate.js",
+    "seed": "node seed.js",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "express": "^5.3.0"
+  }
+}
