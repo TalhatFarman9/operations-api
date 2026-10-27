@@ -27,12 +27,16 @@ for (const file of files) {
   const sql = fs.readFileSync(path.join(folder, file), 'utf8');
 
   // Run the file and note it down together, so a half finished migration is never saved
-  const runMigration = db.transaction(() => {
+  db.exec('BEGIN');
+  try {
     db.exec(sql);
     db.prepare('INSERT INTO schema_migrations (name) VALUES (?)').run(file);
-  });
+    db.exec('COMMIT');
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
+  }
 
-  runMigration();
   console.log('Applied migration:', file);
   applied++;
 }

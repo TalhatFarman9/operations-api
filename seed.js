@@ -29,11 +29,16 @@ const insert = db.prepare(
   'INSERT INTO records (date, course_id, enrollments, completions, revenue) VALUES (?, ?, ?, ?, ?)'
 );
 
-const addAll = db.transaction((rows) => {
-  for (const row of rows) {
+// All rows are saved together, or none of them
+db.exec('BEGIN');
+try {
+  for (const row of sample) {
     insert.run(...row);
   }
-});
+  db.exec('COMMIT');
+} catch (error) {
+  db.exec('ROLLBACK');
+  throw error;
+}
 
-addAll(sample);
 console.log(`Added ${sample.length} sample rows.`);

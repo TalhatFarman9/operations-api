@@ -7,7 +7,7 @@ A small REST API that stores daily course records (date, course, enrollments, co
 - `POST /records` checks the request body and saves a new record
 
 ## Requirements
-- Node.js 22 or newer (developed on Node 24)
+- Node.js 22.13 or newer (developed on Node 24). SQLite is built into Node, so there is nothing extra to install
 - npm and Git
 
 ## Setup
@@ -18,6 +18,8 @@ A small REST API that stores daily course records (date, course, enrollments, co
 5. Start the server: `npm start`
 
 The server runs at http://localhost:3000. To use another port, set the `PORT` environment variable.
+
+Node prints a warning like `ExperimentalWarning: SQLite is an experimental feature` when the scripts run. This is expected and harmless.
 
 ## Migrations
 The SQL files live in the `migrations` folder. `npm run migrate` runs the files that have not been applied yet, in order, and notes each one in a `schema_migrations` table. Running it again does nothing, so it is safe to repeat. The SQLite database file is created automatically at `data/operations.db` and is not committed to Git.
