@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Add Daily Record - SkillUp Academy</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="/">SkillUp Academy Ops</a>
+  <nav><ul>
+    <li><a class="link" href="/">Home</a></li>
+    <li><a class="link active" href="/entry.html">Add Record</a></li>
+  </ul></nav>
+</div></header>
+<main class="wrap">
+  <h1>Daily Operations Entry</h1>
+  <p class="sub">Enter today's figures for one course. All fields are required.</p>
+
+  <section class="card" style="max-width:640px">
+    <!-- success / error banner (shown by entry.js) -->
+    <div id="banner" class="banner" role="alert" aria-live="polite"></div>
+
+    <form id="record-form" novalidate>
+      <div class="field">
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" required>
+        <div class="hint" data-for="date"></div>
+      </div>
+
+      <div class="field">
+        <label for="course_id">Course</label>
+        <select id="course_id" name="course_id" required>
+          <option value="">Loading courses...</option>
+        </select>
+        <div class="hint" data-for="course_id"></div>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="field">
+          <label for="enrollments">Enrollments</label>
+          <input type="number" id="enrollments" name="enrollments" min="0" step="1" inputmode="numeric" placeholder="e.g. 5" required>
+          <div class="hint" data-for="enrollments"></div>
+        </div>
+        <div class="field">
+          <label for="completions">Completions</label>
+          <input type="number" id="completions" name="completions" min="0" step="1" inputmode="numeric" placeholder="e.g. 2" required>
+          <div class="hint" data-for="completions"></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="revenue">Revenue (PKR)</label>
+        <input type="number" id="revenue" name="revenue" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 22500" required>
+        <div class="hint" data-for="revenue"></div>
+      </div>
+
+      <button class="btn" type="submit" id="submit-btn">Submit record</button>
+    </form>
+  </section>
+</main>
+<footer>SkillUp Academy &middot; Internal tool</footer>
+<script src="/js/entry.js"></script>
+</body>
+</html>
