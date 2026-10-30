@@ -1,113 +1,76 @@
-# Operations API
+# SkillUp Academy Operations Dashboard
 
-A small REST API that stores daily course records (date, course, enrollments, completions, revenue). Built with Node.js, Express and SQLite as an internship task.
+Internal web app for SkillUp Academy staff to record daily enrollments, completions and revenue.
 
-## What it does
-- `GET /records` returns all records as a JSON array, newest date first
-- `POST /records` checks the request body and saves a new record
+**Progress:** Task 1 (data model + REST API) done, Task 2 (daily entry form with validation) done.
+Dashboard charts, CSV export and deployment come in Tasks 3 and 4.
 
 ## Requirements
-- Node.js 22.13 or newer (developed on Node 24). SQLite is built into Node, so there is nothing extra to install
-- npm and Git
+- Node.js 22 or newer (`node -v` to check)
 
-## Setup
-1. Clone the repository and go into the folder: `git clone https://github.com/TalhatFarman9/operations-api.git` then `cd operations-api`
-2. Install the packages: `npm install`
-3. Run the migrations to create the database and the `records` table: `npm run migrate`
-4. Optional, add 5 sample rows: `npm run seed`
-5. Start the server: `npm start`
+## Setup and run
+```bash
+npm install
+npm run migrate     # creates data/skillup.db, the tables and the course list
+npm start           # starts the server on http://localhost:3000
+```
 
-The server runs at http://localhost:3000. To use another port, set the `PORT` environment variable.
+## How to open the form locally
+1. Start the server as shown above (keep the terminal open).
+2. Open **http://localhost:3000/entry.html** in your browser (or open http://localhost:3000 and click **Add today's record**).
+3. Pick a date and course, fill in enrollments, completions and revenue, then press **Submit record**.
 
-Node prints a warning like `ExperimentalWarning: SQLite is an experimental feature` when the scripts run. This is expected and harmless.
+> Open the form through the server URL above. Do not double-click `entry.html`
+> (a `file://` page cannot reach the API).
 
-## Migrations
-The SQL files live in the `migrations` folder. `npm run migrate` runs the files that have not been applied yet, in order, and notes each one in a `schema_migrations` table. Running it again does nothing, so it is safe to repeat. The SQLite database file is created automatically at `data/operations.db` and is not committed to Git.
+### What the form does
+| Field | Input type | Rule |
+|-------|-----------|------|
+| Date | `date` (calendar picker, defaults to today) | required |
+| Course | dropdown, loaded from `GET /courses` | required |
+| Enrollments | `number`, `min="0"` | required, whole number >= 0 |
+| Completions | `number`, `min="0"` | required, whole number >= 0 |
+| Revenue (PKR) | `number`, `min="0"` | required, number >= 0 |
 
-The `records` table:
+- JavaScript validates before sending: empty or negative values are blocked and a message appears under each bad field, and nothing is sent to the API.
+- A valid form is sent with `fetch` as `POST /records`.
+- A **green banner** appears on success; a **red banner** shows any server error (for example, a record for the same date and course already exists) or a network error.
 
-| Column | Type | Notes |
-|---|---|---|
-| id | INTEGER | primary key, counts up by itself |
-| date | TEXT | format YYYY-MM-DD |
-| course_id | INTEGER | 1 or more |
-| enrollments | INTEGER | 0 or more |
-| completions | INTEGER | 0 or more |
-| revenue | REAL | 0 or more |
-| created_at | TEXT | set by the database (UTC) |
+### Checking that a record was saved
+```bash
+curl http://localhost:3000/records
+```
+or open http://localhost:3000/records in the browser: the new row appears in the JSON list.
 
 ## API
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/records` | JSON array of all records |
+| POST | `/records` | Validate and store a record (201, 400 or 409) |
+| GET | `/courses` | List of courses for the dropdown |
 
-### GET /records
-Returns a JSON array. Example: `curl http://localhost:3000/records`
+POST body: `{ "date": "2026-10-24", "course_id": 1, "enrollments": 5, "completions": 2, "revenue": 22500 }`
 
-```json
-[
-  {
-    "id": 5,
-    "date": "2026-10-22",
-    "course_id": 2,
-    "enrollments": 10,
-    "completions": 3,
-    "revenue": 20000,
-    "created_at": "2026-10-26 09:57:25"
-  }
-]
+One record is allowed per date per course (duplicates return 409).
+
+## Tests
+```bash
+npm test
 ```
-
-### POST /records
-Send a JSON body with all five fields.
-
-Windows CMD:
-```
-curl -i -X POST http://localhost:3000/records -H "Content-Type: application/json" -d "{\"date\":\"2026-10-26\",\"course_id\":1,\"enrollments\":10,\"completions\":2,\"revenue\":15000}"
-```
-
-macOS or Linux:
-```
-curl -i -X POST http://localhost:3000/records -H "Content-Type: application/json" -d '{"date":"2026-10-26","course_id":1,"enrollments":10,"completions":2,"revenue":15000}'
-```
-
-In Postman: choose POST, enter the URL, open Body, pick raw and JSON, and paste the JSON.
-
-A valid request returns `201 Created` and the saved row. An invalid one returns `400` and a list of what is wrong:
-
-```json
-{
-  "error": "Validation failed",
-  "details": ["revenue is required and must be a number, 0 or more"]
-}
-```
-
-### Validation rules
-- `date` must be a real date written as YYYY-MM-DD
-- `course_id` must be a whole number of 1 or more
-- `enrollments` and `completions` must be whole numbers, 0 or more
-- `revenue` must be a number, 0 or more
-- Numbers must be sent as JSON numbers, not text. `"5"` is rejected
-- Extra fields in the request are ignored
-
-### Status codes
-| Code | When |
-|---|---|
-| 200 | GET worked |
-| 201 | a record was created |
-| 400 | invalid data, or the body is not valid JSON |
-| 404 | the URL does not exist |
-| 500 | something went wrong on the server |
+Starts the server on a temporary database and checks the API and the form page. Your real `data/skillup.db` is not touched.
 
 ## Project structure
 ```
-server.js                      starts Express and connects the routes
-db.js                          opens the SQLite database
-migrate.js                     runs the migration files
-seed.js                        adds 5 sample rows
-migrations/                    SQL files for the table
-middleware/validateRecord.js   checks the body of POST requests
-routes/records.js              GET and POST /records
+server.js                    Express app (API + static files)
+db.js                        SQLite connection
+migrations/                  SQL migrations (tables + seed courses)
+scripts/migrate.js           Migration runner
+scripts/smoke-test.js        npm test
+middleware/validateRecord.js Server-side validation for POST /records
+routes/records.js            GET/POST /records
+routes/courses.js            GET /courses
+public/index.html            Landing page
+public/entry.html            Daily entry form
+public/css/style.css         Shared styles (responsive)
+public/js/entry.js           Form validation + fetch logic
 ```
-
-## Left out
-- No update or delete endpoints, the task only asked for GET and POST
-- `course_id` is not linked to a courses table, because there is no such table in this task
-- The same date and course can be saved more than once
