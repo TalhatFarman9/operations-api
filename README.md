@@ -74,3 +74,7 @@ public/entry.html            Daily entry form
 public/css/style.css         Shared styles (responsive)
 public/js/entry.js           Form validation + fetch logic
 ```
+
+## KPI Dashboard
+To view the operations dashboard with KPI analytics and charts, open:
+`http://localhost:3000` and click on **Dashboard** in the navigation bar.
