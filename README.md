@@ -27,7 +27,7 @@ A Node.js & Express REST API with SQLite database, interactive Chart.js analytic
 ### Task 4: CSV Export & Cloud Deployment
 * File export endpoint (`GET /export`) generating formatted `operations_records.csv`.
 * Automatic database setup and table initialization.
-* Cloud deployment on Render.com (`render.yaml`).
+* Cloud deployment on Render.com with complete build guidelines.
 
 ---
 
