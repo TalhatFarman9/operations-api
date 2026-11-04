@@ -1,80 +1,53 @@
-# SkillUp Academy Operations Dashboard
+# Operations Tracking & Analytics API
 
-Internal web app for SkillUp Academy staff to record daily enrollments, completions and revenue.
+A Node.js & Express REST API with SQLite database, interactive Chart.js analytics dashboard, CSV data export, and cloud deployment.
 
-**Progress:** Task 1 (data model + REST API) done, Task 2 (daily entry form with validation) done.
-Dashboard charts, CSV export and deployment come in Tasks 3 and 4.
+## 🚀 Live Demo
+* **Deployment URL:** https://operations-api-9d0s.onrender.com
+* **Dashboard:** https://operations-api-9d0s.onrender.com/dashboard.html
+* **Operations Entry Form:** https://operations-api-9d0s.onrender.com/entry.html
 
-## Requirements
-- Node.js 22 or newer (`node -v` to check)
+---
 
-## Setup and run
-```bash
-npm install
-npm run migrate     # creates data/skillup.db, the tables and the course list
-npm start           # starts the server on http://localhost:3000
-```
+## ✨ Features & Tasks Implemented
 
-## How to open the form locally
-1. Start the server as shown above (keep the terminal open).
-2. Open **http://localhost:3000/entry.html** in your browser (or open http://localhost:3000 and click **Add today's record**).
-3. Pick a date and course, fill in enrollments, completions and revenue, then press **Submit record**.
+### Task 1: Express REST API & Database Integration
+* Database schema with `courses` and `records` tables.
+* Full CRUD endpoints for managing daily operation records (`GET`, `POST`, `PUT`, `DELETE`).
+* SQL Foreign key constraints and transaction integrity.
 
-> Open the form through the server URL above. Do not double-click `entry.html`
-> (a `file://` page cannot reach the API).
+### Task 2: Input Validation & Error Handling
+* Express middleware to sanitize and validate request payload parameters.
+* Proper HTTP status codes (`400 Bad Request`, `404 Not Found`, `500 Server Error`).
 
-### What the form does
-| Field | Input type | Rule |
-|-------|-----------|------|
-| Date | `date` (calendar picker, defaults to today) | required |
-| Course | dropdown, loaded from `GET /courses` | required |
-| Enrollments | `number`, `min="0"` | required, whole number >= 0 |
-| Completions | `number`, `min="0"` | required, whole number >= 0 |
-| Revenue (PKR) | `number`, `min="0"` | required, number >= 0 |
+### Task 3: KPI Analytics Dashboard & Visualizations
+* Aggregated metrics endpoint (`GET /records/summary`) calculating Total Enrollments, Total Completions, and Revenue.
+* Modern web UI built with HTML5, CSS3, Bootstrap 5, and Chart.js visualizations.
 
-- JavaScript validates before sending: empty or negative values are blocked and a message appears under each bad field, and nothing is sent to the API.
-- A valid form is sent with `fetch` as `POST /records`.
-- A **green banner** appears on success; a **red banner** shows any server error (for example, a record for the same date and course already exists) or a network error.
+### Task 4: CSV Export & Cloud Deployment
+* File export endpoint (`GET /export`) generating formatted `operations_records.csv`.
+* Automatic database setup and table initialization.
+* Cloud deployment on Render.com (`render.yaml`).
 
-### Checking that a record was saved
-```bash
-curl http://localhost:3000/records
-```
-or open http://localhost:3000/records in the browser: the new row appears in the JSON list.
+---
 
-## API
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/records` | JSON array of all records |
-| POST | `/records` | Validate and store a record (201, 400 or 409) |
-| GET | `/courses` | List of courses for the dropdown |
+## 📡 API Endpoints Specification
 
-POST body: `{ "date": "2026-10-24", "course_id": 1, "enrollments": 5, "completions": 2, "revenue": 22500 }`
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/courses` | Fetch list of available courses |
+| `GET` | `/records` | Retrieve operation records with optional filters |
+| `POST` | `/records` | Add a new daily operation record |
+| `PUT` | `/records/:id` | Update existing record by ID |
+| `DELETE` | `/records/:id` | Delete record by ID |
+| `GET` | `/records/summary` | Fetch KPI aggregated metrics |
+| `GET` | `/export` | Download operations dataset as CSV file |
 
-One record is allowed per date per course (duplicates return 409).
+---
 
-## Tests
-```bash
-npm test
-```
-Starts the server on a temporary database and checks the API and the form page. Your real `data/skillup.db` is not touched.
+## 🛠️ Local Installation & Setup
 
-## Project structure
-```
-server.js                    Express app (API + static files)
-db.js                        SQLite connection
-migrations/                  SQL migrations (tables + seed courses)
-scripts/migrate.js           Migration runner
-scripts/smoke-test.js        npm test
-middleware/validateRecord.js Server-side validation for POST /records
-routes/records.js            GET/POST /records
-routes/courses.js            GET /courses
-public/index.html            Landing page
-public/entry.html            Daily entry form
-public/css/style.css         Shared styles (responsive)
-public/js/entry.js           Form validation + fetch logic
-```
-
-## KPI Dashboard
-To view the operations dashboard with KPI analytics and charts, open:
-`http://localhost:3000` and click on **Dashboard** in the navigation bar.
+1. **Clone Repository:**
+   ```bash
+   git clone [https://github.com/TalhatFarman9/operations-api.git](https://github.com/TalhatFarman9/operations-api.git)
+   cd operations-api
